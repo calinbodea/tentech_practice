@@ -1,0 +1,7 @@
+# command that list information such as  name, CIRD range, owner id, Instance Tenancy, Association Id and name of your Default VPC
+
+aws ec2 describe-vpcs --filters "Name=isDefault, Values=true"
+
+# command that describes availability zones in your region
+
+aws ec2 describe-availability-zones
