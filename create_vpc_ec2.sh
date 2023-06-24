@@ -48,7 +48,7 @@ sg_id=$(aws ec2 describe-security-groups --filters "Name=group-name, Values=MY_V
 
 # Modify security group to allow SSH and HTTP traffic 
 aws ec2 authorize-security-group-ingress --group-id $sg_id --protocol tcp --port 22 --cidr 0.0.0.0/0
-aws ec2 authorize-security-group-ingress --group-id Ssg_id --protocol tcp --port 80 --cidr 0.0.0.0/0 
+aws ec2 authorize-security-group-ingress --group-id $sg_id --protocol tcp --port 80 --cidr 0.0.0.0/0 
 
 # Create public subnets
 subnet_id_public_1=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block $MY_PUBLIC_SUBNET_CIDR_1 --availability-zone us-east-1a --query 'Subnet.SubnetId' --output text)
@@ -62,7 +62,7 @@ aws ec2 modify-subnet-attribute --subnet-id $subnet_id_public_2 --map-public-ip-
 
 # Create private subnets
 subnet_id_private_1=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block $MY_PRIVATE_SUBNET_CIDR_1 --availability-zone us-east-1a --query 'Subnet.SubnetId' --output text)
-subnet_id_private_2=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block $MY_PRIVATE_SUBNET_CIDR_2 --availability-zone us-east_1b --query 'Subnet.SubnetId' --output text)
+subnet_id_private_2=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block $MY_PRIVATE_SUBNET_CIDR_2 --availability-zone us-east-1b --query 'Subnet.SubnetId' --output text)
 echo "Created private subnets: $subnet_id_private_1, $subnet_id_private_2"
 
 # Create internet gateway
@@ -92,7 +92,7 @@ nat_gateway_id=$(aws ec2 create-nat-gateway --subnet-id $subnet_id_public_1 --al
 echo "Created NAT gateway: $nat_gateway_id"
 
 # Wait for the NAT gateway to be available
-aws ec2 wait nat-gateway-available --nat-gateway-ids $nat_gateway_id
+aws ec2 wait nat-gateway-available --nat-gateway-id $nat_gateway_id
 echo "NAT gateway is available"
 
 # Create private route table
@@ -111,7 +111,7 @@ echo "Associated private subnets with the private route table"
 # Launch instances in the private subnets
 for ((i=1; i<=2; i++))
 do
-   private_instance_id=$(aws ec2 run-instances --image-id $MY_AMI_ID --instance-type $EC2_TYPE --key-name tentek --security-group-ids $sg_id --subnet-id $subnet_id_private_1 --query 'Instances[0].InstanceId' --output text)
+   private_instance_id=$(aws ec2 run-instances --image-id $MY_AMI_ID --instance-type $EC2_TYPE --key-name $KEY_PAIR_NAME --security-group-ids $sg_id --subnet-id $subnet_id_private_1 --query 'Instances[0].InstanceId' --output text)
     echo "Launched instance $i: $private_instance_id"
 done
 
@@ -119,8 +119,8 @@ done
 # Launch instances in public subnets
 for ((i=1; i<=2; i++))
 do 
-public_instance_id=$(aws ec2 run-instances --image-id $MY_AMI_ID --instance-type $EC2_TYPE --key-name tentek --security-group-ids $sg_id --subnet-id $subnet_id_public1 --query 'Instances[0].InstanceId' --output text)
-echo "Launched instance $i: $public_instance_id" )
+public_instance_id=$(aws ec2 run-instances --image-id $MY_AMI_ID --instance-type $EC2_TYPE --key-name $KEY_PAIR_NAME --security-group-ids $sg_id --subnet-id $subnet_id_public_1 --query 'Instances[0].InstanceId' --output text)
+echo "Launched instance $i: $public_instance_id" 
 done
 
 
