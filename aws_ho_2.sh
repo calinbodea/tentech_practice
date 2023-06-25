@@ -164,6 +164,8 @@ aws elbv2 create-listener --load-balancer-arn $alb_id --protocol HTTP --port 80 
 
  echo "Right now, copy ALB DNS name into your browser!    $alb_dns_name       "    
 
+ echo "Maybe, just maybe I'm done!"
+
 
 
 
