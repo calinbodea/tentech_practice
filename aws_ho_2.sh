@@ -100,10 +100,10 @@ echo "Created EC2 $public_ec2_1a_id"
 aws ec2 create-tags --resources $public_ec2_1a_id --tags Key=Name,Value="AWS_HO2_EC2_PUBLIC_1a"
 
 # Test to see if the httpd service that was supposed to be installed from script is active
-httpd_status_public_ec2_1a=$(aws ssm send-command --instance-ids $public_ec2_1a_id --document-name "AWS-RunShellScript" --parameters "commands=['systemctl is-active httpd']" --output text --query 'CommandInvocations[*].CommandPlugins[*].Output')
+# httpd_status_public_ec2_1a=$(aws ssm send-command --instance-ids $public_ec2_1a_id --document-name "AWS-RunShellScript" --parameters "commands=['systemctl is-active httpd']" --output text --query 'CommandInvocations[*].CommandPlugins[*].Output')
 
 # Test to see if file /var/www/html/index.html has something written in it
-index_html_size_public_ec2_1a=$(aws ssm send-command --instance-ids $public_ec2_1a_id --document-name "AWS-RunShellScript" --parameters "commands=['stat -c %s /var/www/html/index.html']" --output text --query 'CommandInvocations[*].CommandPlugins[*].Output')
+# index_html_size_public_ec2_1a=$(aws ssm send-command --instance-ids $public_ec2_1a_id --document-name "AWS-RunShellScript" --parameters "commands=['stat -c %s /var/www/html/index.html']" --output text --query 'CommandInvocations[*].CommandPlugins[*].Output')
 
 # Check if httpd service is active and index.html is not empty
 #if [ "$httpd_status_public_ec2_1a" = "active" ] && [ "$index_html_size_public_ec2_1a" -gt 0 ]; then
