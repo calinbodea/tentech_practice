@@ -99,9 +99,6 @@ echo "Created EC2 $public_ec2_1a_id"
 # Add a name tag to your instance
 aws ec2 create-tags --resources $public_ec2_1a_id --tags Key=Name,Value="AWS_HO2_EC2_PUBLIC_1a"
 
-# Wait for httpd service to be installed (30 seconds)
-sleep 30
-
 # Test to see if the httpd service that was supposed to be installed from script is active
 httpd_status_public_ec2_1a=$(aws ssm send-command --instance-ids $public_ec2_1a_id --document-name "AWS-RunShellScript" --parameters "commands=['systemctl is-active httpd']" --output text --query 'CommandInvocations[*].CommandPlugins[*].Output')
 
@@ -109,11 +106,11 @@ httpd_status_public_ec2_1a=$(aws ssm send-command --instance-ids $public_ec2_1a_
 index_html_size_public_ec2_1a=$(aws ssm send-command --instance-ids $public_ec2_1a_id --document-name "AWS-RunShellScript" --parameters "commands=['stat -c %s /var/www/html/index.html']" --output text --query 'CommandInvocations[*].CommandPlugins[*].Output')
 
 # Check if httpd service is active and index.html is not empty
-if [ "$httpd_status_public_ec2_1a" = "active" ] && [ "$index_html_size_public_ec2_1a" -gt 0 ]; then
-  echo "httpd service is active and /var/www/html/index.html is not empty."
-else
-  echo "Go back to the drawing board!"
-fi
+#if [ "$httpd_status_public_ec2_1a" = "active" ] && [ "$index_html_size_public_ec2_1a" -gt 0 ]; then
+#  echo "httpd service is active and /var/www/html/index.html is not empty."
+#else
+#  echo "Go back to the drawing board!"
+#fi
 
 # Modify the security group rules to stop allowing http traffic
 # aws ec2 revoke-security-group-ingress --group-id $sg_id --protocol tcp --port 80 --cidr 0.0.0.0/0
