@@ -20,7 +20,7 @@ MY_EC2_AMI_ID=ami-090e0fc566929d98b
 # Define the EC2 type
 EC2_TYPE=t2.micro
 
-# DEfine key pair name
+# Define key pair name
 KEY_PAIR_NAME=tentek
 
 # Create VPC in your desired CIDR range 
@@ -47,8 +47,8 @@ aws ec2 create-tags --resources $subnet_id_public_1 --tags Key=Name,Value="PUBLI
 aws ec2 create-tags --resources $subnet_id_public_2 --tags Key=Name,Value="PUBLIC_SUBNET_AZ_US_EAST_1b"
 
 # Create 2 public subnets in your desired availability zones
-subnet_id_private_1=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block $MY_PUBLIC_SUBNET_CIDR_1 --availability-zone us-east-1a --query 'Subnet.SubnetId' --output text)
-subnet_id_private_2=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block $MY_PUBLIC_SUBNET_CIDR_2 --availability-zone us-east-1b --query 'Subnet.SubnetId' --output text)
+subnet_id_private_1=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block $MY_PRIVATE_SUBNET_CIDR_1 --availability-zone us-east-1a --query 'Subnet.SubnetId' --output text)
+subnet_id_private_2=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block $MY_PRIVATE_SUBNET_CIDR_2 --availability-zone us-east-1b --query 'Subnet.SubnetId' --output text)
 
 # Create a name tag for your public subnets
 aws ec2 create-tags --resources $subnet_id_private_1 --tags Key=Name,Value="PRIVATE_SUBNET_AZ_US_EAST_1a"
@@ -60,7 +60,7 @@ echo "Created internet gateway: $gateway_id"
 
 # Attach the Internet Gateway to the VPC
 aws ec2 attach-internet-gateway --vpc-id $vpc_id --internet-gateway-id $gateway_id
-echo "Attached internet gateway to VPC"
+echo "Attached internet gateway to VPC $vpc_id"
 
 # Retrieve the default route ID that was created when the VPC was created
  default_route_table_id=$(aws ec2 describe-route-tables --filters Name=vpc-id,Values=$vpc_id Name=association.main,Values=true --query 'RouteTables[0].RouteTableId' --output text)
@@ -75,7 +75,7 @@ aws ec2 create-route --route-table-id $default_route_table_id --destination-cidr
 
 # Create private route table 
 private_route_table_id=$(aws ec2 create-route-table --vpc-id $vpc_id --query 'RouteTable.RouteTableId' --output text)
-echo "Created public route table: $private_route_table_id"
+echo "Created private route table: $private_route_table_id"
 
 # Attach private subnets to the private route table
 aws ec2 associate-route-table --route-table-id $private_route_table_id --subnet-id $subnet_id_private_1
@@ -163,5 +163,5 @@ aws elbv2 create-listener --load-balancer-arn $alb_id --protocol HTTP --port 80 
  echo "Right now, copy ALB DNS name into your browser!    $alb_dns_name       "    
 
 
- 
+
 
