@@ -84,11 +84,13 @@ echo "Associated private subnets to the private route table."
 
 # Create a security group for the VPC and get the security group ID
 aws ec2 create-security-group --group-name PUBLIC-SG --description "allows ssh and http to my ec2" --vpc-id $vpc_id
-sg_id=$(aws ec2 describe-security-groups --filters "Name=group-name, Values=PUBLIC_SG" --query "SecurityGroups[0].GroupId" --output text)
+sg_id=$(aws ec2 describe-security-groups --filters "Name=group-name, Values=PUBLIC-SG" --query "SecurityGroups[0].GroupId" --output text)
+echo "Created public security group $sg_id"
 
 # Modify security group rules to allow SSh and HTTP traffic
 aws ec2 authorize-security-group-ingress --group-id $sg_id --protocol tcp --port 22 --cidr 0.0.0.0/0
 aws ec2 authorize-security-group-ingress --group-id $sg_id --protocol tcp --port 80 --cidr 0.0.0.0/0
+echo "Modified sec group rules to allow ssh and http traffic"
 
 # Spin up an EC2 in your public subnet in az us-east-1a, install apache on it and modify /var/www/html/index.html file to display "Hello World from Ec2"
 public_ec2_1a_id=$(aws ec2 run-instances --image-id $MY_EC2_AMI_ID --instance-type $EC2_TYPE --key-name $KEY_PAIR_NAME --security-group-ids $sg_id --subnet-id $subnet_id_public_1 --user-data /Users/calinbodea/workspace/userdata.sh --query 'Instances[0].InstanceId' --output text)
