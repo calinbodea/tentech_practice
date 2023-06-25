@@ -83,7 +83,7 @@ aws ec2 associate-route-table --route-table-id $private_route_table_id --subnet-
 echo "Associated private subnets to the private route table."
 
 # Create a security group for the VPC and get the security group ID
-aws ec2 create-security-group --group-name PUBLIC_SG --description "allows ssh and http to my ec2" --vpc-id $vpc_id
+aws ec2 create-security-group --group-name PUBLIC-SG --description "allows ssh and http to my ec2" --vpc-id $vpc_id
 sg_id=$(aws ec2 describe-security-groups --filters "Name=group-name, Values=PUBLIC_SG" --query "SecurityGroups[0].GroupId" --output text)
 
 # Modify security group rules to allow SSh and HTTP traffic
@@ -117,12 +117,12 @@ fi
 # aws ec2 revoke-security-group-ingress --group-id $sg_id --protocol tcp --port 80 --cidr 0.0.0.0/0
 
 # Create a AMI image of you instance
-custom_ami_id=$(aws ec2 create-image --instance-id $public_ec2_1a_id --name "MY-AMI" --description "MY-CUSTOM_AMI" --query 'ImageId' --output text)
+custom_ami_id=$(aws ec2 create-image --instance-id $public_ec2_1a_id --name "MY-AMI" --description "MY-CUSTOM-AMI" --query 'ImageId' --output text)
 echo "Created AMI of the public istance $public_ec2_1a_id: $custom_ami_id" 
 
 # Launch ec2 in public subnet, az-1b using the custom AMI you just created and the same security group 
 public_ec2_1b_id=$(aws ec2 run-instances --image-id $custom_ami_id --instance-type $EC2_TYPE --key-name $KEY_PAIR_NAME --security-group-ids $sg_id --subnet-id $subnet_id_public_2 --query 'Instances[0].InstanceId' --output text)
-echo "Created EC2 $public_ec2_1b_id"
+echo "Created EC2: $public_ec2_1b_id"
 
 # Add a name tag to your instance
 aws ec2 create-tags --resources $public_ec2_1b_id --tags Key=Name,Value="AWS_HO2_EC2_PUBLIC_1b"
@@ -137,15 +137,15 @@ aws elbv2 register-targets --target-group-arn $target_group_id --targets $public
 echo "Attached instances $public_ec2_1a_id and $public_ec2_1b_id to $target_group_id"
 
 # Create a security group for a ALB and get the security group ID
-aws ec2 create-security-group --group-name ALB_SG --description "allows http to my ALB" --vpc-id $vpc_id
-alb_sg_id=$(aws ec2 describe-security-groups --filters "Name=group-name, Values=ALB_SG" --query "SecurityGroups[0].GroupId" --output text)
+aws ec2 create-security-group --group-name ALB-SG --description "allows http to my ALB" --vpc-id $vpc_id
+alb_sg_id=$(aws ec2 describe-security-groups --filters "Name=group-name, Values=ALB-SG" --query "SecurityGroups[0].GroupId" --output text)
 
 # Modify rules to ALB sec group to allow HTTP traffic to port 80
 aws ec2 authorize-security-group-ingress --group-id $alb_sg_id --protocol tcp --port 80 --cidr 0.0.0.0/0
 
 # Create a new application load balancer using both public subnets
-aws elbv2 create-load-balancer --name "AWS_H02_ALB" --subnets $subnet_id_public_2 $subnet_id_public_1 --security-groups $alb_sg_id --type application
-alb_id=$(aws elbv2 describe-load-balancers --names "AWS_HO2_ALB" --query 'LoadBalancers[0].LoadBalancerArn' --output text)
+aws elbv2 create-load-balancer --name "AWS-H02-ALB" --subnets $subnet_id_public_2 $subnet_id_public_1 --security-groups $alb_sg_id --type application
+alb_id=$(aws elbv2 describe-load-balancers --names "AWS-HO2-ALB" --query 'LoadBalancers[0].LoadBalancerArn' --output text)
 echo "Created ALB: $alb_id"
 
 # Create and configure a listener for the ALB 
