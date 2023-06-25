@@ -70,7 +70,7 @@ aws ec2 associate-route-table --route-table-id $default_route_table_id --subnet-
 aws ec2 associate-route-table --route-table-id $default_route_table_id --subnet-id $subnet_id_public_2
 echo "Associated public subnets to the default route table."
 
-# Create internet route to the route table the public subnets are associated to: destination 0.0.0.0/0 taarget: internet gateway
+# Create internet route to the route table the public subnets are associated to: destination 0.0.0.0/0 target: internet gateway
 aws ec2 create-route --route-table-id $default_route_table_id --destination-cidr-block 0.0.0.0/0 --gateway-id $gateway_id
 
 # Create private route table 
