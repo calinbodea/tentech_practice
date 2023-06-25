@@ -117,18 +117,18 @@ fi
 # aws ec2 revoke-security-group-ingress --group-id $sg_id --protocol tcp --port 80 --cidr 0.0.0.0/0
 
 # Create a AMI image of you instance
-custom_ami_id=$(aws ec2 create-image --instance-id $public_ec2_1a_id --name "My_AMI" --description "My_Custom_AMI" --query 'ImageId' --output text)
+custom_ami_id=$(aws ec2 create-image --instance-id $public_ec2_1a_id --name "MY-AMI" --description "MY-CUSTOM_AMI" --query 'ImageId' --output text)
 echo "Created AMI of the public istance $public_ec2_1a_id: $custom_ami_id" 
 
 # Launch ec2 in public subnet, az-1b using the custom AMI you just created and the same security group 
- public_ec2_1b_id=$(aws ec2 run-instances --image-id $custom_ami_id --instance-type $EC2_TYPE --key-name $KEY_PAIR_NAME --security-group-ids $sg_id --subnet-id $subnet_id_public_2 --query 'Instances[0].InstanceId' --output text)
+public_ec2_1b_id=$(aws ec2 run-instances --image-id $custom_ami_id --instance-type $EC2_TYPE --key-name $KEY_PAIR_NAME --security-group-ids $sg_id --subnet-id $subnet_id_public_2 --query 'Instances[0].InstanceId' --output text)
 echo "Created EC2 $public_ec2_1b_id"
 
 # Add a name tag to your instance
 aws ec2 create-tags --resources $public_ec2_1b_id --tags Key=Name,Value="AWS_HO2_EC2_PUBLIC_1b"
 
 # Create a target group in your VPC
-target_group_id=$(aws elbv2 create-target-group --name "AWS_HO_TG" --protocol HTTP --port 80 --vpc-id $vpc_id --query 'TargetGroups[0].TargetGroupArn' --output text)
+target_group_id=$(aws elbv2 create-target-group --name "AWS-HO-TG" --protocol HTTP --port 80 --vpc-id $vpc_id --query 'TargetGroups[0].TargetGroupArn' --output text)
 echo "Created target group: $target_group_id"
 
 # Attach both ec2 to your target group
