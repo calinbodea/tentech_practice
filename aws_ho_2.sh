@@ -97,6 +97,9 @@ echo "Created EC2 $public_ec2_1a_id"
 # Add a name tag to your instance
 aws ec2 create-tags --resources $public_ec2_1a_id --tags Key=Name,Value="AWS_HO2_EC2_PUBLIC_1a"
 
+# Wait for httpd service to be installed (30 seconds)
+sleep 30
+
 # Test to see if the httpd service that was supposed to be installed from script is active
 httpd_status_public_ec2_1a=$(aws ssm send-command --instance-ids $public_ec2_1a_id --document-name "AWS-RunShellScript" --parameters "commands=['systemctl is-active httpd']" --output text --query 'CommandInvocations[*].CommandPlugins[*].Output')
 
@@ -111,10 +114,10 @@ else
 fi
 
 # Modify the security group rules to stop allowing http traffic
-aws ec2 revoke-security-group-ingress --group-id $sg_id --protocol tcp --port 80 --cidr 0.0.0.0/0
+# aws ec2 revoke-security-group-ingress --group-id $sg_id --protocol tcp --port 80 --cidr 0.0.0.0/0
 
 # Create a AMI image of you instance
-custom_ami_id=$(aws ec2 create-image --instance-id  $public_ec2_1a_id --name "My_AMI" --description "My_Custom_AMI" --query 'ImageId' --output text)
+custom_ami_id=$(aws ec2 create-image --instance-id $public_ec2_1a_id --name "My_AMI" --description "My_Custom_AMI" --query 'ImageId' --output text)
 echo "Created AMI of the public istance $public_ec2_1a_id: $custom_ami_id" 
 
 # Launch ec2 in public subnet, az-1b using the custom AMI you just created and the same security group 
@@ -138,7 +141,7 @@ aws ec2 create-security-group --group-name ALB_SG --description "allows http to 
 alb_sg_id=$(aws ec2 describe-security-groups --filters "Name=group-name, Values=ALB_SG" --query "SecurityGroups[0].GroupId" --output text)
 
 # Modify rules to ALB sec group to allow HTTP traffic to port 80
-aws ec2 authorize-security-group-ingress --group-id $alb_sg_id --protocol tcp --port 80 --cidr 0.0.0.0/
+aws ec2 authorize-security-group-ingress --group-id $alb_sg_id --protocol tcp --port 80 --cidr 0.0.0.0/0
 
 # Create a new application load balancer using both public subnets
 aws elbv2 create-load-balancer --name "AWS_H02_ALB" --subnets $subnet_id_public_2 $subnet_id_public_1 --security-groups $alb_sg_id --type application
