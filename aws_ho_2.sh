@@ -96,6 +96,8 @@ echo "Modified sec group rules to allow ssh and http traffic"
 public_ec2_1a_id=$(aws ec2 run-instances --image-id $MY_EC2_AMI_ID --instance-type $EC2_TYPE --key-name $KEY_PAIR_NAME --security-group-ids $sg_id --subnet-id $subnet_id_public_1 --user-data /Users/calinbodea/workspace/userdata.sh --query 'Instances[0].InstanceId' --output text)
 echo "Created EC2 $public_ec2_1a_id" 
 
+sleep 300
+
 # Add a name tag to your instance
 aws ec2 create-tags --resources $public_ec2_1a_id --tags Key=Name,Value="AWS_HO2_EC2_PUBLIC_1a"
 
