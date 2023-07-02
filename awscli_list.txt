@@ -1,0 +1,16 @@
+# command that list information such as  name, CIRD range, owner id, Instance Tenancy, Association Id and name of your Default VPC
+aws ec2 describe-vpcs --filters "Name=isDefault, Values=true"
+
+# command that describes availability zones in your region
+aws ec2 describe-availability-zones
+
+# command that enables DNS hostnames for the VPC
+aws ec2 modify-vpc-attribute --vpc-id $vpc_id --enable-dns-hostnames
+
+# command that describes AZs in your AWS region of choice
+aws ec2 describe-availability-zones --region us-east-1
+
+# command that describes AZ in your AWS by query
+aws ec2 describe-availability-zones --region us-east-1 --query 'AvailabilityZones[6].ZoneName' --output json
+
+#  
