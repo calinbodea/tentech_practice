@@ -1,0 +1,18 @@
+function taxbill(){
+
+
+declare -i price=$1
+
+declare -i tax=$(($price/10))
+
+echo "$(($tax+$price))"
+}
+
+potatoes=100
+tomatoes=240
+cucumber=1200
+
+taxbill $potatoes
+taxbill $tomatoes
+taxbill $cucumber
+
